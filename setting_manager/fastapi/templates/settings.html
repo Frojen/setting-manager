@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application Settings</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .settings-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .settings-table th, .settings-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .settings-table th { background-color: #f2f2f2; }
+        .source-database { color: #28a745; font-weight: bold; }
+        .source-environment { color: #17a2b8; }
+        .source-default { color: #6c757d; }
+        input[type="text"] {
+            padding: 4px;
+            width: 100%;
+            flex: 1;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 4px 8px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            white-space: nowrap;
+        }
+        .btn-update {
+            background: #007bff;
+            color: white;
+            border: none;
+        }
+        .btn-reset {
+            background: #dc3545;
+            color: white;
+            border: none;
+        }
+        .btn-reset:disabled {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px dashed #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .btn-reset:not(:disabled):hover { background: #c82333; }
+        .value-info { font-size: 0.9em; color: #666; }
+        .actions-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+        }
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-width: 300px;
+            text-align: center;
+        }
+        .message-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .hidden { display: none; }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8em;
+            font-style: italic;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .col-type { width: 100px; }
+        .col-source { width: 120px; }
+        .col-values { width: 200px; }
+
+        .value-text {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            vertical-align: bottom;
+            cursor: help;
+        }
+
+        .input-container {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 100%;
+        }
+
+        .input-collapsed {
+            width: 100%;
+            padding: 4px;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: inherit;
+            resize: none;
+            height: 32px;
+            line-height: 24px;
+        }
+
+        .input-expanded {
+            width: 100%;
+            padding: 4px;
+            box-sizing: border-box;
+            resize: none;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: inherit;
+            height: auto;
+            min-height: 32px;
+            max-height: 50vh;
+            overflow-y: hidden; /* Скрываем прокрутку по умолчанию */
+        }
+
+        /* Показываем прокрутку только когда контент не помещается */
+        .input-expanded.need-scroll {
+            overflow-y: auto;
+        }
+
+        .expand-toggle {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            padding: 4px 6px;
+            z-index: 2;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .expand-toggle:hover {
+            color: #007bff;
+            background: #f8f9fa;
+            border-color: #007bff;
+            box-shadow: 0 2px 4px rgba(0,123,255,0.2);
+        }
+
+        /* Иконки вместо текста */
+        .expand-toggle::before {
+            content: "⤢"; /* Иконка развернуть */
+        }
+
+        .expand-toggle.expanded::before {
+            content: "⤡"; /* Иконка свернуть */
+        }
+
+        .value-text {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            vertical-align: bottom;
+        }
+    </style>
+</head>
+<body>
+    <h1>Application Settings</h1>
+
+    <div id="message" class="hidden"></div>
+
+    <div class="actions">
+        <button type="button" onclick="resetAllSettings()"
+                style="background: #dc3545; color: white; padding: 8px 16px;">
+            Reset All Settings
+        </button>
+    </div>
+
+    <table class="settings-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Current Value & Actions</th>
+                <th class="col-type">Type</th>
+                <th class="col-source">Source</th>
+                <th class="col-values">Values</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for setting in settings %}
+            <tr id="row-{{ setting.name }}">
+                <td><strong>{{ setting.name }}</strong></td>
+                <td>
+                    <div class="input-group">
+                        <div class="input-container">
+                            <textarea
+                                id="input-{{ setting.name }}"
+                                aria-label="Value for {{ setting.name }}"
+                                placeholder="Enter new value"
+                                class="input-collapsed">{{ setting.value }}</textarea>
+                            <button type="button"
+                                    class="expand-toggle"
+                                    id="toggle-{{ setting.name }}"
+                                    onclick="toggleInput('{{ setting.name }}')"
+                                    style="display: none;"
+                                    aria-label="Expand/collapse textarea">
+                            </button>
+                        </div>
+                        <div class="actions-group">
+                            <button type="button" class="btn-update" onclick="updateSetting('{{ setting.name }}')">
+                                Update
+                            </button>
+                            <div class="tooltip">
+                                {% if setting.can_reset %}
+                                <button type="button" class="btn-reset" onclick="resetSetting('{{ setting.name }}')">
+                                    Reset
+                                </button>
+                                {% else %}
+                                <button type="button" class="btn-reset" disabled>
+                                    Reset
+                                </button>
+                                <span class="tooltiptext">Reset available only for database values</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="col-type">{{ setting.type }}</td>
+                <td class="col-source">
+                    <span class="source-{{ setting.source }}">● {{ setting.source }}</span>
+                </td>
+                <td class="col-values">
+                    <div class="value-info">
+                        <div>
+                            <strong>Env:</strong>
+                            {% if setting.environment_value is not none %}
+                                <div class="tooltip">
+                                    <span class="value-text">
+                                        {{ setting.environment_value }}
+                                    </span>
+                                    <span class="tooltiptext">
+                                        {{ setting.environment_value }}
+                                    </span>
+                                </div>
+                            {% else %}
+                                <span style="color: #999; font-style: italic;">(not set)</span>
+                            {% endif %}
+                        </div>
+                        {% if setting.default_value is not none %}
+                        <div>
+                            <strong>Default:</strong>
+                            <div class="tooltip">
+                                <span class="value-text">
+                                    {{ setting.default_value }}
+                                </span>
+                                <span class="tooltiptext">
+                                    {{ setting.default_value }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>{{ setting.description or '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        const ROUTER_PREFIX = "{{ router_prefix }}";
+
+        function showMessage(text, type = 'success') {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message message-${type}`;
+            messageEl.classList.remove('hidden');
+
+            setTimeout(() => {
+                messageEl.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Функция для переключения режима textarea
+        function toggleInput(settingName) {
+            const textarea = document.getElementById(`input-${settingName}`);
+            const toggle = document.getElementById(`toggle-${settingName}`);
+
+            if (textarea.classList.contains('input-collapsed')) {
+                // Раскрываем
+                textarea.classList.remove('input-collapsed');
+                textarea.classList.add('input-expanded');
+                toggle.classList.add('expanded');
+                textarea.focus();
+                adjustTextareaHeight(textarea);
+            } else {
+                // Скрываем
+                textarea.classList.remove('input-expanded');
+                textarea.classList.add('input-collapsed');
+                toggle.classList.remove('expanded');
+                textarea.style.height = '32px';
+            }
+            // Всегда проверяем видимость кнопки после переключения
+            checkTextareaOverflow(settingName);
+        }
+
+        // Показ/скрытие кнопки раскрытия
+        function checkTextareaOverflow(settingName) {
+            const textarea = document.getElementById(`input-${settingName}`);
+            const toggle = document.getElementById(`toggle-${settingName}`);
+
+            // В свернутом режиме показываем кнопку если текст не помещается
+            // В развернутом режиме всегда показываем кнопку свернуть
+            if (textarea.classList.contains('input-collapsed')) {
+                const isOverflowing = textarea.scrollWidth > textarea.clientWidth;
+                toggle.style.display = isOverflowing ? 'block' : 'none';
+            } else {
+                toggle.style.display = 'block';
+            }
+        }
+
+        // Функция для автоматической высоты textarea
+        function adjustTextareaHeight(textarea) {
+            textarea.style.height = 'auto';
+            const contentHeight = textarea.scrollHeight;
+            const maxHeight = window.innerHeight * 0.5;
+            const newHeight = Math.min(contentHeight, maxHeight);
+            textarea.style.height = newHeight + 'px';
+
+            // Показываем прокрутку только если контент не помещается
+            if (contentHeight > maxHeight) {
+                textarea.classList.add('need-scroll');
+            } else {
+                textarea.classList.remove('need-scroll');
+            }
+        }
+
+        // Функция обновления настройки
+        async function updateSetting(settingName) {
+            const textarea = document.getElementById(`input-${settingName}`);
+            const value = textarea.value.trim();
+
+            if (!value) {
+                showMessage('Please enter a value', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${ROUTER_PREFIX}/${settingName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `value=${encodeURIComponent(value)}`
+                });
+
+                if (response.ok) {
+                    showMessage(`Setting "${settingName}" updated successfully`);
+
+                    // Обновляем только то, что изменилось
+                    const resetButton = document.querySelector(`#row-${settingName} .btn-reset`);
+                    if (resetButton) {
+                        resetButton.disabled = false;
+                        resetButton.onclick = () => resetSetting(settingName);
+                    }
+
+                    // Обновляем источник на "database"
+                    const sourceElement = document.querySelector(`#row-${settingName} .col-source span`);
+                    if (sourceElement) {
+                        sourceElement.className = 'source-database';
+                        sourceElement.textContent = '● database';
+                    }
+                } else {
+                    const result = await response.json();
+                    showMessage('Error: ' + (result.detail || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Функция для сброса настройки
+        async function resetSetting(settingName) {
+            if (confirm(`Reset setting "${settingName}" to environment/default value?`)) {
+                try {
+                    const response = await fetch(`${ROUTER_PREFIX}/${settingName}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        showMessage(`Setting "${settingName}" reset successfully`);
+
+                        // Обновляем UI настройки
+                        updateSettingUI(settingName, result.value, result.source);
+                    } else {
+                        const result = await response.json();
+                        showMessage('Error resetting setting: ' + (result.detail || 'Unknown error'), 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // Функция для обновления UI настройки
+        function updateSettingUI(settingName, value, source) {
+            // Обновляем значение в textarea
+            const textarea = document.getElementById(`input-${settingName}`);
+            if (textarea) {
+                textarea.value = value;
+            }
+
+            // Обновляем источник - правильный селектор
+            const sourceElement = document.querySelector(`#row-${settingName} .col-source span`);
+            if (sourceElement) {
+                sourceElement.className = `source-${source}`;
+                sourceElement.textContent = `● ${source}`;
+            }
+
+            // Обновляем кнопку Reset - после сброса она всегда disabled
+            const resetButton = document.querySelector(`#row-${settingName} .btn-reset`);
+            if (resetButton) {
+                resetButton.disabled = true;
+                resetButton.onclick = null;
+            }
+
+            // Проверяем видимость кнопки раскрытия
+            checkTextareaOverflow(settingName);
+        }
+
+        // Функция для сброса всех настроек
+        async function resetAllSettings() {
+            if (confirm('Are you sure you want to reset ALL settings? This will remove all database values.')) {
+                try {
+                    const response = await fetch(`${ROUTER_PREFIX}/actions/reset-all`, {
+                        method: 'POST'
+                    });
+
+                    if (response.ok) {
+                        showMessage('All settings reset successfully');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        const result = await response.json();
+                        showMessage('Error: ' + (result.detail || 'Unknown error'), 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                const settingName = textarea.id.replace('input-', '');
+                checkTextareaOverflow(settingName);
+
+                // Обработчик ввода текста
+                textarea.addEventListener('input', function() {
+                    checkTextareaOverflow(settingName);
+                    if (this.classList.contains('input-expanded')) {
+                        adjustTextareaHeight(this);
+                    }
+                });
+
+                // Обработчик изменения размера
+                textarea.addEventListener('resize', function() {
+                    checkTextareaOverflow(settingName);
+                });
+
+                // Обработчик Enter
+                textarea.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        if (e.ctrlKey || this.classList.contains('input-expanded')) {
+                            // Ctrl+Enter или Enter в раскрытом режиме - перенос строки
+                            if (!e.ctrlKey) {
+                                setTimeout(() => {
+                                    adjustTextareaHeight(this);
+                                    checkTextareaOverflow(settingName);
+                                }, 0);
+                            }
+                        } else {
+                            // Enter в свернутом режиме - отправка с подтверждением
+                            e.preventDefault();
+                            if (confirm(`Update setting "${settingName}" to "${this.value}"?`)) {
+                                updateSetting(settingName);
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
