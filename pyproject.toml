@@ -1,8 +1,62 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "setting-manager"
 version = "0.1.0"
-description = "Add your description here"
-requires-python = ">=3.10"
-dependencies = [
-    "pydantic-settings>=2.11.0",
+description = "A flexible settings management library"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
 ]
+dependencies = [
+    "pydantic",
+    "pydantic-settings",
+]
+
+[project.optional-dependencies]
+mongo = ["motor"]
+fastapi = ["fastapi"]
+dev = [
+    "setting-manager[mongo,fastapi]",
+    "fastapi[standard]",
+    "motor",
+    "pre-commit",
+    "pytest",
+    "ruff",
+    "ty"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Frojen/setting-manager"
+
+# --- Инструменты для разработки ---
+
+[tool.hatch.scripts]
+# Запуск dev-сервера для example.py
+dev = "fastapi dev example:app"
+
+
+[tool.ruff]
+line-length = 120
+target-version = 'py311'
+output-format = "concise"
+extend-exclude = ["venv", ".venv"]
+
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "T20", "PT", "I", "C90", "UP", "S", "N", "DTZ"]
+unfixable = ["F401"]
+ignore = []
+
+
+[tool.ty.terminal]
+output-format = "concise"
+
+
+[tool.ty.environment]
+python-version = "3.12"
