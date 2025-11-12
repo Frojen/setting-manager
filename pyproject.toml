@@ -1,0 +1,8 @@
+[project]
+name = "setting-manager"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic-settings>=2.11.0",
+]
