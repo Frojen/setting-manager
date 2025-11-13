@@ -7,11 +7,18 @@ name = "setting-manager"
 version = "0.1.0"
 description = "A flexible settings management library"
 readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Konstantin Zhmurko", email = "prog@zhmyrko.ru"}
+]
+keywords = ["library", "setting", "feature flag"]
 requires-python = ">=3.11"
 classifiers = [
-    "Programming Language :: Python :: 3",
+    "Development Status :: Alpha",
+    "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
 ]
 dependencies = [
     "pydantic",
