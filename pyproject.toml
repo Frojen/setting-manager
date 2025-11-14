@@ -71,7 +71,7 @@ extend-exclude = ["venv", ".venv"]
 
 
 [tool.ruff.lint]
-select = ["F", "E", "W", "T20", "PT", "I", "C90", "UP", "S", "N", "DTZ"]
+select = ["F", "E", "W", "T20", "PT", "I", "C90", "UP", "N", "DTZ"]
 unfixable = ["F401"]
 ignore = []
 

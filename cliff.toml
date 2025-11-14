@@ -1,34 +1,52 @@
 [changelog]
 header = """
-# Changelog\n
-All notable changes to this project will be documented in this file.\n
+# Changelog
+
+> All notable changes to this project will be documented in this file.
+>
+> The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+> and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 """
 body = """
 {% if version -%}
-    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
 {% else -%}
-    ## [unreleased]
+## [Unreleased]
 {% endif -%}
+
 {% for group, commits in commits | group_by(attribute="group") %}
-    ### {{ group | upper_first }}
-    {% for commit in commits %}
-        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }}\
-    {% endfor %}
-{% endfor %}\n
+### {{ group | upper_first }}
+{% for commit in commits %}
+- {% if commit.breaking %}[**BREAKING**] {% endif %}{{ commit.message | upper_first }} ([`{{ commit.id | truncate(length=7, end="") }}`](https://github.com/Frojen/setting-manager/commit/{{ commit.id }})){% endfor %}
+{% if not loop.last %}
+
+{% endif %}
+{% endfor %}
 """
 
 [git]
 conventional_commits = true
-tag_pattern = "v?[0-9].*"
 filter_unconventional = true
 split_commits = false
 commit_parsers = [
-    { message = "^feat", group = "Features"},
-    { message = "^fix", group = "Bug Fixes"},
-    { message = "^doc", group = "Documentation"},
-    { message = "^perf", group = "Performance"},
-    { message = "^refactor", group = "Refactor"},
-    { message = "^test", group = "Testing"},
-    { message = "^chore", group = "Miscellaneous"},
-    { body = ".*security", group = "Security"},
+    # ИСКЛЮЧЕНИЯ - ПЕРВЫМИ!
+    { message = ".*\\[skip ci\\].*", skip = true},
+    { message = "^ci", group = "👷 CI", skip = true},
+    { message = "^chore", group = "🔧 Maintenance", skip = true},
+    { message = "^style", group = "💎 Style", skip = true},
+
+    { message = "^feat", group = "🚀 Features"},
+    { message = "^fix", group = "🐛 Bug Fixes"},
+    { message = "^perf", group = "⚡ Performance"},
+    { message = "^refactor", group = "🔧 Refactor"},
+    { message = "^docs", group = "📚 Documentation"},
+    { message = "^test", group = "🧪 Tests"},
+    { message = "^build", group = "📦 Build"},
+    { body = ".*security", group = "🔒 Security"},
+]
+
+[git.conventional_commit_parsers]
+field_parsers = [
+    { name = "scope", pattern = "\\((.+)\\)" },
 ]

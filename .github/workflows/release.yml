@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.PAT_TOKEN }}
         fetch-depth: 0
 
     - name: Install UV
@@ -34,7 +34,7 @@ jobs:
         uv run semantic-release version
         uv run semantic-release publish
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
     - name: Build package
       if: steps.semantic.outputs.released == 'true'
