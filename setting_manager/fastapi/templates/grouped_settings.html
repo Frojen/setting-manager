@@ -4,12 +4,60 @@
     <title>Application Settings</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        .settings-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .settings-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .settings-table th, .settings-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         .settings-table th { background-color: #f2f2f2; }
         .source-database { color: #28a745; font-weight: bold; }
         .source-environment { color: #17a2b8; }
         .source-default { color: #6c757d; }
+
+        /* Стили для секций */
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            margin: 20px 0 0 0;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        .section-header.collapsed {
+            margin-bottom: 0;
+            border-radius: 8px 8px 8px 8px;
+        }
+
+        .section-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .section-content.collapsed {
+            display: none;
+        }
+
+        .toggle-icon {
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .section-header:first-child {
+            margin-top: 20px;
+        }
+
         input[type="text"] {
             padding: 4px;
             width: 100%;
@@ -163,10 +211,9 @@
             height: auto;
             min-height: 32px;
             max-height: 50vh;
-            overflow-y: hidden; /* Скрываем прокрутку по умолчанию */
+            overflow-y: hidden;
         }
 
-        /* Показываем прокрутку только когда контент не помещается */
         .input-expanded.need-scroll {
             overflow-y: auto;
         }
@@ -195,13 +242,12 @@
             box-shadow: 0 2px 4px rgba(0,123,255,0.2);
         }
 
-        /* Иконки вместо текста */
         .expand-toggle::before {
-            content: "⤢"; /* Иконка развернуть */
+            content: "⤢";
         }
 
         .expand-toggle.expanded::before {
-            content: "⤡"; /* Иконка свернуть */
+            content: "⤡";
         }
 
         .value-text {
@@ -212,6 +258,7 @@
             display: inline-block;
             vertical-align: bottom;
         }
+
         /* Стили для чувствительных полей */
         .sensitive-field {
             background-color: #fff3cd;
@@ -257,130 +304,153 @@
                 style="background: #dc3545; color: white; padding: 8px 16px;">
             Reset All Settings
         </button>
+        <button type="button" onclick="toggleAllSections()"
+                style="background: #6c757d; color: white; padding: 8px 16px; margin-left: 10px;">
+            Toggle All Sections
+        </button>
     </div>
 
-    <table class="settings-table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Current Value & Actions</th>
-                <th class="col-type">Type</th>
-                <th class="col-source">Source</th>
-                <th class="col-values">Values</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for setting in settings %}
-            <tr id="row-{{ setting.name }}"
-                {% if setting.is_sensitive %}class="sensitive-field"{% endif %}
-                {% if not setting.allow_change %}class="readonly-field"{% endif %}>
-                <td>
-                    <strong>{{ setting.name }}</strong>
-                    {% if setting.is_sensitive %}
-                    <div class="sensitive-warning">🔒 Sensitive field</div>
-                    {% endif %}
-                    {% if not setting.allow_change %}
-                    <div class="sensitive-warning">🚫 Read-only</div>
-                    {% endif %}
-                </td>
-                <td>
-                    <div class="input-group">
-                        <div class="input-container">
-                            <textarea
-                                id="input-{{ setting.name }}"
-                                aria-label="Value for {{ setting.name }}"
-                                placeholder="{% if setting.is_sensitive %}Enter new sensitive value{% else %}Enter new value{% endif %}"
-                                class="input-collapsed"
-                                {% if not setting.allow_change %}disabled{% endif %}>{{ setting.value }}</textarea>
-                            <button type="button"
-                                    class="expand-toggle"
-                                    id="toggle-{{ setting.name }}"
-                                    onclick="toggleInput('{{ setting.name }}')"
-                                    style="display: none;"
-                                    aria-label="Expand/collapse textarea"
-                                    {% if not setting.allow_change %}disabled{% endif %}>
-                            </button>
-                        </div>
-                        <div class="actions-group">
-                            <button type="button" class="btn-update" onclick="updateSetting('{{ setting.name }}')"
-                                    {% if not setting.allow_change %}disabled{% endif %}>
-                                Update
-                            </button>
-                            <div class="tooltip">
-                                {% if setting.can_reset and setting.allow_change %}
-                                <button type="button" class="btn-reset" onclick="resetSetting('{{ setting.name }}')">
-                                    Reset
-                                </button>
-                                {% else %}
-                                <button type="button" class="btn-reset" disabled>
-                                    Reset
-                                </button>
-                                <span class="tooltiptext">
-                                    {% if not setting.allow_change %}
-                                    Reset not available for read-only settings
-                                    {% else %}
-                                    Reset available only for database values
-                                    {% endif %}
-                                </span>
-                                {% endif %}
+    {% for section_name, settings in settings_grouped.items() %}
+    <div class="section-container">
+        <div class="section-header {% if section_name == 'System' %}collapsed{% endif %}"
+             onclick="toggleSection('{{ section_name }}')"
+             id="header-{{ section_name }}">
+            <span>{{ section_name }}</span>
+            <span class="toggle-icon {% if section_name == 'System' %}collapsed{% endif %}"
+                  id="toggle-{{ section_name }}">▼</span>
+        </div>
+        <div class="section-content {% if section_name == 'System' %}collapsed{% endif %}"
+             id="content-{{ section_name }}">
+            <table class="settings-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Current Value & Actions</th>
+                        <th class="col-type">Type</th>
+                        <th class="col-source">Source</th>
+                        <th class="col-values">Values</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for setting in settings %}
+                    <tr id="row-{{ setting.name }}"
+                        {% if setting.is_sensitive %}class="sensitive-field"{% endif %}
+                        {% if not setting.allow_change %}class="readonly-field"{% endif %}>
+                        <td>
+                            <strong>{{ setting.name }}</strong>
+                            {% if setting.is_sensitive %}
+                            <div class="sensitive-warning">🔒 Sensitive field</div>
+                            {% endif %}
+                            {% if not setting.allow_change %}
+                            <div class="sensitive-warning">🚫 Read-only</div>
+                            {% endif %}
+                            {% if setting.required_role %}
+                            <div class="role-warning" style="color: #856404; font-size: 0.8em;">
+                                👑 Requires role: {{ setting.required_role }}
                             </div>
-                        </div>
-                    </div>
-                </td>
-                <td class="col-type">{{ setting.type }}</td>
-                <td class="col-source">
-                    <span class="source-{{ setting.source }}">● {{ setting.source }}</span>
-                </td>
-                <td class="col-values">
-                    <div class="value-info">
-                        <div>
-                            <strong>Env:</strong>
-                            {% if setting.environment_value is not none %}
-                                <div class="tooltip">
-                                    <span class="value-text {% if setting.is_sensitive %}masked-value{% endif %}">
-                                        {{ setting.environment_value }}
-                                    </span>
-                                    {% if setting.is_sensitive %}
-                                    <span class="tooltiptext">
-                                        This is a masked sensitive value
-                                    </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="input-group">
+                                <div class="input-container">
+                                    <textarea
+                                        id="input-{{ setting.name }}"
+                                        aria-label="Value for {{ setting.name }}"
+                                        placeholder="{% if setting.is_sensitive %}Enter new sensitive value{% else %}Enter new value{% endif %}"
+                                        class="input-collapsed"
+                                        {% if not setting.allow_change %}disabled{% endif %}>{{ setting.value }}</textarea>
+                                    <button type="button"
+                                            class="expand-toggle"
+                                            id="toggle-input-{{ setting.name }}"
+                                            onclick="toggleInput('{{ setting.name }}')"
+                                            style="display: none;"
+                                            aria-label="Expand/collapse textarea"
+                                            {% if not setting.allow_change %}disabled{% endif %}>
+                                    </button>
+                                </div>
+                                <div class="actions-group">
+                                    <button type="button" class="btn-update" onclick="updateSetting('{{ setting.name }}')"
+                                            {% if not setting.allow_change %}disabled{% endif %}>
+                                        Update
+                                    </button>
+                                    <div class="tooltip">
+                                        {% if setting.can_reset and setting.allow_change %}
+                                        <button type="button" class="btn-reset" onclick="resetSetting('{{ setting.name }}')">
+                                            Reset
+                                        </button>
+                                        {% else %}
+                                        <button type="button" class="btn-reset" disabled>
+                                            Reset
+                                        </button>
+                                        <span class="tooltiptext">
+                                            {% if not setting.allow_change %}
+                                            Reset not available for read-only settings
+                                            {% else %}
+                                            Reset available only for database values
+                                            {% endif %}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="col-type">{{ setting.type }}</td>
+                        <td class="col-source">
+                            <span class="source-{{ setting.source }}">● {{ setting.source }}</span>
+                        </td>
+                        <td class="col-values">
+                            <div class="value-info">
+                                <div>
+                                    <strong>Env:</strong>
+                                    {% if setting.environment_value is not none %}
+                                        <div class="tooltip">
+                                            <span class="value-text {% if setting.is_sensitive %}masked-value{% endif %}">
+                                                {{ setting.environment_value }}
+                                            </span>
+                                            {% if setting.is_sensitive %}
+                                            <span class="tooltiptext">
+                                                This is a masked sensitive value
+                                            </span>
+                                            {% else %}
+                                            <span class="tooltiptext">
+                                                {{ setting.environment_value }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
                                     {% else %}
-                                    <span class="tooltiptext">
-                                        {{ setting.environment_value }}
-                                    </span>
+                                        <span style="color: #999; font-style: italic;">(not set)</span>
                                     {% endif %}
                                 </div>
-                            {% else %}
-                                <span style="color: #999; font-style: italic;">(not set)</span>
-                            {% endif %}
-                        </div>
-                        {% if setting.default_value is not none %}
-                        <div>
-                            <strong>Default:</strong>
-                            <div class="tooltip">
-                                <span class="value-text {% if setting.is_sensitive %}masked-value{% endif %}">
-                                    {{ setting.default_value }}
-                                </span>
-                                {% if setting.is_sensitive %}
-                                <span class="tooltiptext">
-                                    This is a masked sensitive value
-                                </span>
-                                {% else %}
-                                <span class="tooltiptext">
-                                    {{ setting.default_value }}
-                                </span>
+                                {% if setting.default_value is not none %}
+                                <div>
+                                    <strong>Default:</strong>
+                                    <div class="tooltip">
+                                        <span class="value-text {% if setting.is_sensitive %}masked-value{% endif %}">
+                                            {{ setting.default_value }}
+                                        </span>
+                                        {% if setting.is_sensitive %}
+                                        <span class="tooltiptext">
+                                            This is a masked sensitive value
+                                        </span>
+                                        {% else %}
+                                        <span class="tooltiptext">
+                                            {{ setting.default_value }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
                                 {% endif %}
                             </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                </td>
-                <td>{{ setting.description or '' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                        </td>
+                        <td>{{ setting.description or '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
 
     <script>
         const ROUTER_PREFIX = "{{ router_prefix }}";
@@ -396,10 +466,45 @@
             }, 3000);
         }
 
+        // Функция для переключения секции
+        function toggleSection(sectionName) {
+            const header = document.getElementById(`header-${sectionName}`);
+            const content = document.getElementById(`content-${sectionName}`);
+            const toggle = document.getElementById(`toggle-${sectionName}`);
+
+            header.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+            toggle.classList.toggle('collapsed');
+        }
+
+        // Функция для переключения всех секций
+        function toggleAllSections() {
+            const headers = document.querySelectorAll('.section-header');
+            const allCollapsed = Array.from(headers).every(header => header.classList.contains('collapsed'));
+
+            headers.forEach(header => {
+                const sectionName = header.id.replace('header-', '');
+                const content = document.getElementById(`content-${sectionName}`);
+                const toggle = document.getElementById(`toggle-${sectionName}`);
+
+                if (allCollapsed) {
+                    // Если все свернуты - разворачиваем все
+                    header.classList.remove('collapsed');
+                    content.classList.remove('collapsed');
+                    toggle.classList.remove('collapsed');
+                } else {
+                    // Если не все свернуты - сворачиваем все
+                    header.classList.add('collapsed');
+                    content.classList.add('collapsed');
+                    toggle.classList.add('collapsed');
+                }
+            });
+        }
+
         // Функция для переключения режима textarea
         function toggleInput(settingName) {
             const textarea = document.getElementById(`input-${settingName}`);
-            const toggle = document.getElementById(`toggle-${settingName}`);
+            const toggle = document.getElementById(`toggle-input-${settingName}`);
 
             if (textarea.classList.contains('input-collapsed')) {
                 // Раскрываем
@@ -422,7 +527,7 @@
         // Показ/скрытие кнопки раскрытия
         function checkTextareaOverflow(settingName) {
             const textarea = document.getElementById(`input-${settingName}`);
-            const toggle = document.getElementById(`toggle-${settingName}`);
+            const toggle = document.getElementById(`toggle-input-${settingName}`);
 
             // В свернутом режиме показываем кнопку если текст не помещается
             // В развернутом режиме всегда показываем кнопку свернуть
@@ -520,8 +625,8 @@
 
         // Функция для обновления UI настройки
         function updateSettingUI(settingName, value, source) {
-            // Обновляем значение в textarea
             const textarea = document.getElementById(`input-${settingName}`);
+
             if (textarea) {
                 textarea.value = value;
             }

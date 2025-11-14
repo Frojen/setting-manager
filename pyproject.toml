@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "setting-manager"
-version = "0.1.0"
+version = "0.2.0"
 description = "A flexible settings management library"
 readme = "README.md"
 license = {text = "MIT"}
@@ -14,7 +14,7 @@ authors = [
 keywords = ["library", "setting", "feature flag"]
 requires-python = ">=3.11"
 classifiers = [
-    "Development Status :: Alpha",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -67,3 +67,7 @@ output-format = "concise"
 
 [tool.ty.environment]
 python-version = "3.12"
+
+
+[tool.basedpyright]
+typeCheckingMode = "standard"
