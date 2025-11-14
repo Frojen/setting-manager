@@ -19,3 +19,4 @@ repos:
     hooks:
       # Run the type checker.
       - id: ty-check
+        language: system

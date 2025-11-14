@@ -2,10 +2,9 @@ import os
 from collections.abc import Callable
 from typing import Any
 
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
 
 from ..manager import SettingInfo, SettingsManager
 
