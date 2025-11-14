@@ -2,12 +2,12 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
+from fastapi import FastAPI, HTTPException, Request, status
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
-from fastapi import FastAPI, HTTPException, Request, status
+from setting_manager import SettingsManager
 from setting_manager.fastapi.route import create_settings_router
-from setting_manager.manager import SettingsManager
 from setting_manager.storage import MemorySettingsStorage
 
 os.environ["LOG_LEVEL"] = "INFO"

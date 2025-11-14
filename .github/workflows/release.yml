@@ -1,0 +1,63 @@
+name: Manual Release with Auto-Version
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v1
+
+    - name: Set up Python
+      run: uv python install 3.11
+
+    - name: Install dependencies
+      run: uv sync --all-extras
+
+    - name: Run tests
+      run: uv run pytest
+
+    - name: Semantic Release
+      id: semantic
+      run: |
+        uv run semantic-release version
+        uv run semantic-release publish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build package
+      if: steps.semantic.outputs.released == 'true'
+      run: uv build
+
+    - name: Publish to PyPI
+      if: steps.semantic.outputs.released == 'true'
+      run: uv publish --token ${{ secrets.PYPI_TOKEN }}
+
+    - name: Update changelog structure
+      if: steps.semantic.outputs.released == 'true'
+      run: |
+        # Добавляем обратно unreleased секцию
+        echo "" >> CHANGELOG.md
+        echo "## [unreleased]" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add CHANGELOG.md
+        git commit -m "docs: add unreleased section [skip ci]" || exit 0
+        git push
+
+    - name: No release needed
+      if: steps.semantic.outputs.released == 'false'
+      run: echo "No version change detected - skipping release"

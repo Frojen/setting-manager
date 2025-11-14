@@ -898,7 +898,6 @@ dependencies = [
 [package.optional-dependencies]
 dev = [
     { name = "fastapi", extra = ["standard"] },
-    { name = "motor" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "ruff" },
@@ -915,14 +914,12 @@ mongo = [
 requires-dist = [
     { name = "fastapi", marker = "extra == 'fastapi'" },
     { name = "fastapi", extras = ["standard"], marker = "extra == 'dev'" },
-    { name = "motor", marker = "extra == 'dev'" },
     { name = "motor", marker = "extra == 'mongo'" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "ruff", marker = "extra == 'dev'" },
-    { name = "setting-manager", extras = ["mongo", "fastapi"], marker = "extra == 'dev'" },
     { name = "ty", marker = "extra == 'dev'" },
 ]
 provides-extras = ["mongo", "fastapi", "dev"]

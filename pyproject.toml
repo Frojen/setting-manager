@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "setting-manager"
-version = "0.2.0"
+version = "0.1.0"
 description = "A flexible settings management library"
 readme = "README.md"
 license = {text = "MIT"}
@@ -28,10 +28,9 @@ dependencies = [
 [project.optional-dependencies]
 mongo = ["motor"]
 fastapi = ["fastapi"]
+
 dev = [
-    "setting-manager[mongo,fastapi]",
     "fastapi[standard]",
-    "motor",
     "pre-commit",
     "pytest",
     "ruff",
@@ -40,6 +39,22 @@ dev = [
 
 [project.urls]
 "Homepage" = "https://github.com/Frojen/setting-manager"
+
+[tool.hatch.version]
+path = "src/setting_manager/__init__.py"
+
+[tool.semantic_release]
+version_variable = "src/setting_manager/__init__.py:__version__"
+commit_version_number = true
+tag_commit = true
+upload_to_pypi = false
+upload_to_release = true
+major_on_zero = true
+
+[tool.semantic_release.changelog]
+exclude_commit_patterns = [
+    "^Merge", "^Revert", "^fixup!", "^squash!"
+]
 
 # --- Инструменты для разработки ---
 
@@ -66,7 +81,7 @@ output-format = "concise"
 
 
 [tool.ty.environment]
-python-version = "3.12"
+python-version = "3.11"
 
 
 [tool.basedpyright]
