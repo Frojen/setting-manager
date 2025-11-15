@@ -25,17 +25,19 @@ dependencies = [
     "pydantic-settings",
 ]
 
-[project.optional-dependencies]
-mongo = ["motor"]
-fastapi = ["fastapi"]
-
+[dependency-groups]
 dev = [
     "fastapi[standard]",
+    "motor",
     "pre-commit",
     "pytest",
     "ruff",
     "ty"
 ]
+
+[project.optional-dependencies]
+mongo = ["motor"]
+fastapi = ["fastapi"]
 
 [project.urls]
 "Homepage" = "https://github.com/Frojen/setting-manager"
@@ -63,7 +65,7 @@ allow_zero_version = true
 major_on_zero = false
 
 [tool.semantic_release.changelog]
-exclude_commit_patterns = ["^ci"]
+exclude_commit_patterns = ["^ci", "^chore"]
 template_dir = ".github/templates"
 mode = "init"
 

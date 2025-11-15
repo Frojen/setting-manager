@@ -1,6 +1,12 @@
 default_language_version:
     python: python3.11
 repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.10.0
+    hooks:
+      - id: commitizen
+      - id: commitizen-branch
+        stages: [ pre-push ]
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.8.22
     hooks:
