@@ -7,7 +7,7 @@ artifacts = ["CHANGELOG.md"]
 
 [project]
 name = "setting-manager"
-version = "0.1.0"
+version = "0.2.0"
 description = "A flexible settings management library"
 readme = "README.md"
 license = {text = "MIT"}
