@@ -2,9 +2,6 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.build]
-artifacts = ["CHANGELOG.md"]
-
 [project]
 name = "setting-manager"
 version = "0.2.0"
@@ -42,6 +39,7 @@ dev = [
 
 [project.urls]
 "Homepage" = "https://github.com/Frojen/setting-manager"
+"Changelog" = "https://github.com/Frojen/setting-manager/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "src/setting_manager/__init__.py"
