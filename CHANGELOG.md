@@ -3,6 +3,16 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### 📦 Build System
+
+
+
+- Add link for changelog to pypi
+  ([`daf0f5b`](https://github.com/Frojen/setting-manager/commit/daf0f5b498fb4b94d6efaf4079e5ef7a2ebe5cd0))
+
+
 ## v0.2.0 (2025-11-15)
 
 ### 📦 Build System
