@@ -5,38 +5,28 @@
 
 ## Unreleased
 
-### Bug Fixes
-
-
-- Test
-  ([`7446a31`](https://github.com/Frojen/setting-manager/commit/7446a31848472c4205b19cc9d275c2b0bd5fad30))
-
 ### 📦 Build System
 
 
 
 - Add changelog
-  ([`bc527a4`](https://github.com/Frojen/setting-manager/commit/bc527a4e19a57179308525b0eeae2d246357fc81))
+  ([`1390d89`](https://github.com/Frojen/setting-manager/commit/1390d8964f2a42dc10293a531e968ce45dffec6f))
 
 ### 🚀 New Features
 
 
 
-- Base functional
-  ([`16d019f`](https://github.com/Frojen/setting-manager/commit/16d019f76012057054f8c321783715642e26ead6))
-
-- Initial implementation
-  ([`b3549b8`](https://github.com/Frojen/setting-manager/commit/b3549b8d0403a088730b7d8da696f336000ba314))
+- Add base implementation
+  ([`ae1d371`](https://github.com/Frojen/setting-manager/commit/ae1d371d803490e8173b453bf4a572fca1be58dd))
 
 ### 🧪 Tests
 
 
 
 - Add basic test
-  ([`edda0d2`](https://github.com/Frojen/setting-manager/commit/edda0d28fb6bed75100b965ec60d30b969e788e7))
+  ([`cd957d7`](https://github.com/Frojen/setting-manager/commit/cd957d76576f3c354cd5ef3318480659eb4d21a2))
 
-- Test
-  ([`ee00353`](https://github.com/Frojen/setting-manager/commit/ee003538a591274cd7a526cf4b43c30506c97e49))
 
-- Test
-  ([`580c446`](https://github.com/Frojen/setting-manager/commit/580c44608622ce33b76abfb89c1323344f202994))
+## v0.1.0 (2025-11-12)
+
+- Initial Release
