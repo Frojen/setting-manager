@@ -5,12 +5,25 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+
+- Incorrect order of determining the source
+  ([`e4acda0`](https://github.com/Frojen/setting-manager/commit/e4acda0c552dea9cb8e907dc4005c2669c784a7b))
+
 ### 📦 Build System
 
 
 
 - Add link for changelog to pypi
   ([`daf0f5b`](https://github.com/Frojen/setting-manager/commit/daf0f5b498fb4b94d6efaf4079e5ef7a2ebe5cd0))
+
+### 🚀 New Features
+
+
+
+- Use local path for api template
+  ([`da9bbd8`](https://github.com/Frojen/setting-manager/commit/da9bbd8a244209212c59af9d0c716dd625112fb3))
 
 
 ## v0.2.0 (2025-11-15)
