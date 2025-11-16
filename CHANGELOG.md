@@ -3,7 +3,7 @@
 > All notable changes to this project will be documented in this file.
 
 
-## Unreleased
+## v0.3.0 (2025-11-16)
 
 ### Bug Fixes
 
