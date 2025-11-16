@@ -129,7 +129,7 @@ class SettingsManager:
             if field_name in db_settings:
                 source = "database"
                 can_reset = True
-            elif current_value != default_value:
+            elif field_name in self._environment_fields_set:
                 source = "environment"
                 can_reset = False
             else:
