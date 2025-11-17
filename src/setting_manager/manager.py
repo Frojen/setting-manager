@@ -31,9 +31,9 @@ class SettingsManager:
     Менеджер настроек для работы с BaseSettings и произвольным хранилищем
     """
 
-    def __init__(self, settings_instance: BaseSettings, storage: SettingsStorage):
+    def __init__(self, settings_instance: BaseSettings, storage: SettingsStorage | None = None):
         self.settings = settings_instance
-        self.storage = storage
+        self._storage: SettingsStorage | None = storage
         self._settings_class = type(settings_instance)
 
         # Создаем экземпляр без данных из базы для получения environment/default значений
@@ -52,6 +52,12 @@ class SettingsManager:
             self._environment_values[field_name] = (
                 getattr(self._clean_instance, field_name) if field_name in self._environment_fields_set else None
             )
+
+    @property
+    def storage(self) -> SettingsStorage:
+        if self._storage is None:
+            raise RuntimeError("Storage is not initialized. Please call initialize(storage=...) first.")
+        return self._storage
 
     def on_change(self, field_name: str):
         """Декоратор для регистрации callback-функции"""
@@ -75,8 +81,10 @@ class SettingsManager:
             if not self._callbacks[field_name]:
                 del self._callbacks[field_name]
 
-    async def initialize(self) -> None:
+    async def initialize(self, storage: SettingsStorage | None = None) -> None:
         """Инициализация - загрузка настроек из хранилища"""
+        if storage:
+            self._storage = storage
         await self.load_from_storage()
 
     async def load_from_storage(self) -> None:
