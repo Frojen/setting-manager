@@ -47,6 +47,7 @@ def create_settings_router(  # noqa: C901
             {
                 "request": request,
                 "settings_grouped": settings_grouped,
+                "router_prefix": router_prefix,
                 "user_role": user_role,
             },
         )
