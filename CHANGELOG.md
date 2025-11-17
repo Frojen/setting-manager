@@ -3,6 +3,15 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### Bug Fixes
+
+
+- Incorrect path for api template
+  ([`05d8c49`](https://github.com/Frojen/setting-manager/commit/05d8c49b2184cdc4938cf28c07502a3d46bcdd59))
+
+
 ## v0.4.0 (2025-11-17)
 
 ### 📦 Build System
