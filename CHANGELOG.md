@@ -19,6 +19,13 @@
 - Update README.md
   ([`6321033`](https://github.com/Frojen/setting-manager/commit/632103398c7a9cd2c733f584fe70aaefbc9c978d))
 
+### 🚀 New Features
+
+
+
+- Add optional storage init to initialize
+  ([`27a50b1`](https://github.com/Frojen/setting-manager/commit/27a50b153ee25138a0570a1cfc35b0504439cc05))
+
 
 ## v0.3.0 (2025-11-16)
 
