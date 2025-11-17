@@ -3,6 +3,16 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### 🚀 New Features
+
+
+
+- Add normalize router_prefix
+  ([`02fde3d`](https://github.com/Frojen/setting-manager/commit/02fde3da0337a4675ae226e269583cb0717dfffd))
+
+
 ## v0.4.1 (2025-11-17)
 
 ### Bug Fixes
