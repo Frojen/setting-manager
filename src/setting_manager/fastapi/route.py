@@ -25,6 +25,12 @@ def create_settings_router(  # noqa: C901
         security_dependency: Зависимость для проверки доступа к роутам
                              Должна возвращать роль пользователя или None
     """
+    # Нормализуем router_prefix
+    if router_prefix.endswith("/"):
+        router_prefix = router_prefix[:-1]
+    if not router_prefix.startswith("/"):
+        router_prefix = f"/{router_prefix}"
+
     router = APIRouter(prefix=router_prefix, tags=["settings"])
 
     # Настройка шаблонов
