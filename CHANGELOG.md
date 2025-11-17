@@ -5,6 +5,13 @@
 
 ## Unreleased
 
+### 📦 Build System
+
+
+
+- Add build for docs changes
+  ([`cd1da7f`](https://github.com/Frojen/setting-manager/commit/cd1da7f1fc685afc04899673c5104ad698900050))
+
 ### 📚 Documentation
 
 
