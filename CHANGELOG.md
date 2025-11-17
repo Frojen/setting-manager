@@ -3,6 +3,16 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### 📚 Documentation
+
+
+
+- Update README.md
+  ([`6321033`](https://github.com/Frojen/setting-manager/commit/632103398c7a9cd2c733f584fe70aaefbc9c978d))
+
+
 ## v0.3.0 (2025-11-16)
 
 ### Bug Fixes
