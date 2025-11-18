@@ -455,6 +455,11 @@
     <script>
         const ROUTER_PREFIX = "{{ router_prefix }}";
 
+        function getApiUrl(path) {
+            const fullPath = `${ROUTER_PREFIX}${path}`;
+            return new URL(fullPath, window.location.origin).href;
+        }
+
         function showMessage(text, type = 'success') {
             const messageEl = document.getElementById('message');
             messageEl.textContent = text;
@@ -566,7 +571,7 @@
             }
 
             try {
-                const response = await fetch(`.${ROUTER_PREFIX}/${settingName}`, {
+                const response = await fetch(getApiUrl(`/${settingName}`), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -603,7 +608,7 @@
         async function resetSetting(settingName) {
             if (confirm(`Reset setting "${settingName}" to environment/default value?`)) {
                 try {
-                    const response = await fetch(`.${ROUTER_PREFIX}/${settingName}`, {
+                    const response = await fetch(getApiUrl(`/${settingName}`), {
                         method: 'DELETE'
                     });
 
@@ -653,7 +658,7 @@
         async function resetAllSettings() {
             if (confirm('Are you sure you want to reset ALL settings? This will remove all database values.')) {
                 try {
-                    const response = await fetch(`.${ROUTER_PREFIX}/actions/reset-all`, {
+                    const response = await fetch(getApiUrl('/actions/reset-all'), {
                         method: 'POST'
                     });
 
