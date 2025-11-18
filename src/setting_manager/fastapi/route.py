@@ -48,12 +48,17 @@ def create_settings_router(  # noqa: C901
     async def settings_page(request: Request, user_role: str | None = get_user_role_dependency()):
         """Страница управления настройками"""
         settings_grouped = await settings_manager.get_settings_grouped_by_sections(user_role)
+
+        # Учитываем root_path от прокси-сервера (например, Nginx)
+        root_path = request.scope.get("root_path", "")
+        full_prefix = f"{root_path}{router_prefix}"
+
         return templates.TemplateResponse(
             "grouped_settings.html",
             {
                 "request": request,
                 "settings_grouped": settings_grouped,
-                "router_prefix": router_prefix,
+                "router_prefix": full_prefix,
                 "user_role": user_role,
             },
         )
