@@ -3,6 +3,15 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### Bug Fixes
+
+
+- Url for the api request is generated without https
+  ([`30573e6`](https://github.com/Frojen/setting-manager/commit/30573e65cbd4ab3b4cf98d7b0b0c50c8399ac95f))
+
+
 ## v0.5.0 (2025-11-17)
 
 ### 🚀 New Features
