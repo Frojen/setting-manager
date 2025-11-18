@@ -5,7 +5,8 @@
 
 ## Unreleased
 
-### Bug Fixes
+### 🐛 Bug Fixes
+
 
 
 - Root_path for the url in the template is not taken
@@ -14,7 +15,8 @@
 
 ## v0.5.1 (2025-11-18)
 
-### Bug Fixes
+### 🐛 Bug Fixes
+
 
 
 - Url for the api request is generated without https
@@ -33,7 +35,8 @@
 
 ## v0.4.1 (2025-11-17)
 
-### Bug Fixes
+### 🐛 Bug Fixes
+
 
 
 - Incorrect path for api template
@@ -66,7 +69,8 @@
 
 ## v0.3.0 (2025-11-16)
 
-### Bug Fixes
+### 🐛 Bug Fixes
+
 
 
 - Incorrect order of determining the source
