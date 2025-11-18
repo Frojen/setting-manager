@@ -3,6 +3,15 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### Bug Fixes
+
+
+- Root_path for the url in the template is not taken
+  ([`9eb9c67`](https://github.com/Frojen/setting-manager/commit/9eb9c67595aab89f7165cc4cacc260444805d41a))
+
+
 ## v0.5.1 (2025-11-18)
 
 ### Bug Fixes
