@@ -49,8 +49,8 @@ def create_settings_router(  # noqa: C901
         """Страница управления настройками"""
         settings_grouped = await settings_manager.get_settings_grouped_by_sections(user_role)
 
-        # Используем url_for для получения полного пути, включая root_path и все смонтированные префиксы
-        api_base_path = str(request.url_for("settings_page")).rstrip("/")
+        # Получаем только компонент пути из URL (учитываем path от прокси-сервера).
+        api_base_path = request.url_for("settings_page").path.rstrip("/")
 
         return templates.TemplateResponse(
             "grouped_settings.html",
