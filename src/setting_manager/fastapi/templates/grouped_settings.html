@@ -453,7 +453,7 @@
     {% endfor %}
 
     <script>
-        const ROUTER_PREFIX = "{{ router_prefix }}";
+        const API_BASE_PATH = "{{ api_base_path }}";
 
         function showMessage(text, type = 'success') {
             const messageEl = document.getElementById('message');
@@ -566,7 +566,7 @@
             }
 
             try {
-                const response = await fetch(`${ROUTER_PREFIX}/${settingName}`, {
+                const response = await fetch(`${API_BASE_PATH}/${settingName}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -603,7 +603,7 @@
         async function resetSetting(settingName) {
             if (confirm(`Reset setting "${settingName}" to environment/default value?`)) {
                 try {
-                    const response = await fetch(`${ROUTER_PREFIX}/${settingName}`, {
+                    const response = await fetch(`${API_BASE_PATH}/${settingName}`, {
                         method: 'DELETE'
                     });
 
@@ -653,7 +653,7 @@
         async function resetAllSettings() {
             if (confirm('Are you sure you want to reset ALL settings? This will remove all database values.')) {
                 try {
-                    const response = await fetch(`${ROUTER_PREFIX}/actions/reset-all`, {
+                    const response = await fetch(`${API_BASE_PATH}/actions/reset-all`, {
                         method: 'POST'
                     });
 

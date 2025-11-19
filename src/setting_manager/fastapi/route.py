@@ -49,16 +49,15 @@ def create_settings_router(  # noqa: C901
         """Страница управления настройками"""
         settings_grouped = await settings_manager.get_settings_grouped_by_sections(user_role)
 
-        # Учитываем root_path от прокси-сервера (например, Nginx)
-        root_path = request.scope.get("root_path", "")
-        full_prefix = f"{root_path}{router_prefix}"
+        # Используем url_for для получения полного пути, включая root_path и все смонтированные префиксы
+        api_base_path = str(request.url_for("settings_page")).rstrip("/")
 
         return templates.TemplateResponse(
             "grouped_settings.html",
             {
                 "request": request,
                 "settings_grouped": settings_grouped,
-                "router_prefix": full_prefix,
+                "api_base_path": api_base_path,
                 "user_role": user_role,
             },
         )
