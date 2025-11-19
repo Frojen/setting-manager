@@ -3,6 +3,16 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### 🐛 Bug Fixes
+
+
+
+- Missing subpath prefix
+  ([`24f7e98`](https://github.com/Frojen/setting-manager/commit/24f7e98c7d3068669a6a1ed1351b113cd1f03bb0))
+
+
 ## v0.5.2 (2025-11-18)
 
 ### 🐛 Bug Fixes
