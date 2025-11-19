@@ -3,6 +3,16 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### 🐛 Bug Fixes
+
+
+
+- Template root url
+  ([`121de5f`](https://github.com/Frojen/setting-manager/commit/121de5f370303038f4bbc758fc96a99fa490a754))
+
+
 ## v0.5.4 (2025-11-19)
 
 ### 🐛 Bug Fixes
