@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "setting-manager"
-version = "0.5.4"
+version = "0.5.5"
 description = "A flexible settings management library"
 readme = "README.md"
 license = {text = "MIT"}
