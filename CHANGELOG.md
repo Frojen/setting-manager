@@ -3,6 +3,16 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### 🐛 Bug Fixes
+
+
+
+- Get url from container
+  ([`d4f6924`](https://github.com/Frojen/setting-manager/commit/d4f6924eed3404e5f749447b16e095901229ae71))
+
+
 ## v0.5.3 (2025-11-19)
 
 ### 🐛 Bug Fixes
