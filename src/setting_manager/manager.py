@@ -163,7 +163,7 @@ class SettingsManager:
                     is_sensitive=is_sensitive,
                     allow_change=self._get_allow_change(field_name, field_info, user_role),
                     section=self._get_section(field_info),
-                    required_role=required_role if required_role != user_role else None,
+                    required_role=required_role if required_role and required_role != user_role else None,
                 )
             )
 
@@ -293,6 +293,21 @@ class SettingsManager:
 
     def _get_allow_change(self, field_name: str, field_info: Any, user_role: str | None = None) -> bool:
         """Получает разрешение на изменение настройки"""
+        # Шаг 1: Проверяем явный запрет на изменение. Он имеет наивысший приоритет.
+        raw_allow_change = None
+        json_schema_extra = getattr(field_info, "json_schema_extra", None)
+        if json_schema_extra and isinstance(json_schema_extra, dict):
+            if "allow_change" in json_schema_extra:
+                raw_allow_change = json_schema_extra["allow_change"]
+        if raw_allow_change is False:
+            return False
+
+        # Шаг 2: Проверяем, является ли пользователь суперпользователем.
+        # Если да, он может изменять все, что не запрещено явно на шаге 1.
+        if self.superuser_role and user_role == self.superuser_role:
+            return True
+
+        # Шаг 3: Пользователь не является суперпользователем. Применяем правила доступа.
         # Проверяем, является ли поле чувствительным
         is_sensitive = self._is_sensitive_field(field_name, field_info)
 
@@ -300,22 +315,13 @@ class SettingsManager:
         default_allow_change = not is_sensitive
 
         # Проверяем явное указание allow_change в json_schema_extra
-        allow_change = default_allow_change
-        json_schema_extra = getattr(field_info, "json_schema_extra", None)
-        if json_schema_extra and isinstance(json_schema_extra, dict):
-            if "allow_change" in json_schema_extra:
-                allow_change = json_schema_extra["allow_change"]
-
+        allow_change = raw_allow_change if raw_allow_change is not None else default_allow_change
         if not allow_change:
             return False
 
-        # Если у пользователя роль суперюзера, разрешаем изменение
-        if self.superuser_role and user_role == self.superuser_role:
-            return True
-
         # Проверяем required_role
         required_role = self._get_required_role(field_info)
-        if required_role and user_role != required_role:
+        if required_role is not None and user_role != required_role:
             return False
 
         return True
@@ -370,8 +376,9 @@ class SettingsManager:
 
     def _get_required_role(self, field_info: Any) -> str | None:
         """Получает требуемую роль для изменения настройки"""
+        required_role = self.superuser_role
         json_schema_extra = getattr(field_info, "json_schema_extra", None)
         if json_schema_extra and isinstance(json_schema_extra, dict):
             if "required_role" in json_schema_extra:
-                return json_schema_extra["required_role"]
-        return None
+                required_role = json_schema_extra["required_role"]
+        return required_role
