@@ -31,8 +31,9 @@ dev = [
     "motor",
     "pre-commit",
     "pytest",
+    "pytest-asyncio",
     "ruff",
-    "ty"
+    "ty",
 ]
 
 [project.optional-dependencies]
@@ -102,3 +103,13 @@ python-version = "3.11"
 
 [tool.basedpyright]
 typeCheckingMode = "standard"
+
+
+[tool.pytest.ini_options]
+asyncio_mode = 'auto'
+pythonpath = [
+  "."
+]
+testpaths = [
+  "tests"
+]
