@@ -14,6 +14,8 @@ def create_settings_router(  # noqa: C901
     router_prefix: str = "/setting-manager",
     template_dir: str | None = None,
     security_dependency: Callable | None = None,
+    superuser_role: str | None = None,
+    **kwargs,
 ) -> APIRouter:
     """
     Создает роутер FastAPI для управления настройками
@@ -24,7 +26,11 @@ def create_settings_router(  # noqa: C901
         template_dir: Директория с шаблонами
         security_dependency: Зависимость для проверки доступа к роутам
                              Должна возвращать роль пользователя или None
+        superuser_role: Роль суперпользователя, который может редактировать все
     """
+    # Устанавливаем роль суперпользователя в менеджере
+    settings_manager.superuser_role = superuser_role
+
     # Нормализуем router_prefix
     if router_prefix.endswith("/"):
         router_prefix = router_prefix[:-1]

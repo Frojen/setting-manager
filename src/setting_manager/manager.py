@@ -31,9 +31,15 @@ class SettingsManager:
     Менеджер настроек для работы с BaseSettings и произвольным хранилищем
     """
 
-    def __init__(self, settings_instance: BaseSettings, storage: SettingsStorage | None = None):
+    def __init__(
+        self,
+        settings_instance: BaseSettings,
+        storage: SettingsStorage | None = None,
+        superuser_role: str | None = None,
+    ):
         self.settings = settings_instance
         self._storage: SettingsStorage | None = storage
+        self.superuser_role = superuser_role
         self._settings_class = type(settings_instance)
 
         # Создаем экземпляр без данных из базы для получения environment/default значений
@@ -302,6 +308,10 @@ class SettingsManager:
 
         if not allow_change:
             return False
+
+        # Если у пользователя роль суперюзера, разрешаем изменение
+        if self.superuser_role and user_role == self.superuser_role:
+            return True
 
         # Проверяем required_role
         required_role = self._get_required_role(field_info)
