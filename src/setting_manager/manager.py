@@ -23,7 +23,6 @@ class SettingInfo(BaseModel):
     is_sensitive: bool
     allow_change: bool
     section: str
-    required_role: str | None
 
 
 class SettingsManager:
@@ -119,11 +118,17 @@ class SettingsManager:
     async def get_settings_with_sources(self, user_role: str | None = None) -> list[SettingInfo]:
         """Возвращает список всех настроек с информацией об источниках"""
         settings_info = []
+        is_superuser = self.superuser_role and user_role == self.superuser_role
 
         # Получаем актуальные настройки из базы
         db_settings = await self.storage.get_all()
 
         for field_name, field_info in self._settings_class.model_fields.items():
+            # Получаем required_role для настройки
+            required_role = self._get_required_role(field_info)
+            if required_role and user_role not in required_role:
+                continue
+
             current_value = getattr(self.settings, field_name)
             default_value = self._default_values[field_name]
             environment_value = self._environment_values[field_name]
@@ -131,11 +136,16 @@ class SettingsManager:
             # Проверяем, является ли поле чувствительным
             is_sensitive = self._is_sensitive_field(field_name, field_info)
 
-            # Получаем required_role для настройки
-            required_role = self._get_required_role(field_info)
+            # Для суперпользователя всегда отдаем реальные значения для поля "current value" (текущее значение).
+            # Для остальных - маскируем чувствительные данные.
+            display_value = (
+                current_value
+                if is_superuser
+                else (self._mask_sensitive_value(current_value) if is_sensitive else current_value)
+            )
 
-            # Маскируем значения для отображения, если поле чувствительное
-            display_value = self._mask_sensitive_value(current_value) if is_sensitive else current_value
+            # Для полей "default_value" и "environment_value" всегда маскируем чувствительные данные,
+            # даже для суперпользователя.
             display_default = self._mask_sensitive_value(default_value) if is_sensitive else default_value
             display_environment = self._mask_sensitive_value(environment_value) if is_sensitive else environment_value
 
@@ -163,7 +173,6 @@ class SettingsManager:
                     is_sensitive=is_sensitive,
                     allow_change=self._get_allow_change(field_name, field_info, user_role),
                     section=self._get_section(field_info),
-                    required_role=required_role if required_role and required_role != user_role else None,
                 )
             )
 
@@ -293,42 +302,35 @@ class SettingsManager:
 
     def _get_allow_change(self, field_name: str, field_info: Any, user_role: str | None = None) -> bool:
         """Получает разрешение на изменение настройки"""
-        # Шаг 1: Проверяем явный запрет на изменение. Он имеет наивысший приоритет.
-        raw_allow_change = None
-        json_schema_extra = getattr(field_info, "json_schema_extra", None)
-        if json_schema_extra and isinstance(json_schema_extra, dict):
-            if "allow_change" in json_schema_extra:
-                raw_allow_change = json_schema_extra["allow_change"]
-        if raw_allow_change is False:
+        json_schema_extra = getattr(field_info, "json_schema_extra", None) or {}
+
+        # Шаг 1: Полный запрет. Имеет наивысший приоритет.
+        if json_schema_extra.get("immutable") is True:
             return False
 
-        # Шаг 2: Проверяем, является ли пользователь суперпользователем.
-        # Если да, он может изменять все, что не запрещено явно на шаге 1.
+        # Шаг 2: Суперпользователь. Может все, что не запрещено на шаге 1.
         if self.superuser_role and user_role == self.superuser_role:
             return True
 
-        # Шаг 3: Пользователь не является суперпользователем. Применяем правила доступа.
+        # Шаг 3: Проверка ролей для обычных пользователей.
         # Проверяем, является ли поле чувствительным
         is_sensitive = self._is_sensitive_field(field_name, field_info)
 
         # По умолчанию: чувствительные поля нельзя изменять, обычные можно
         default_allow_change = not is_sensitive
-
-        # Проверяем явное указание allow_change в json_schema_extra
-        allow_change = raw_allow_change if raw_allow_change is not None else default_allow_change
-        if not allow_change:
+        if not json_schema_extra.get("allow_change", default_allow_change):
             return False
 
         # Проверяем required_role
         required_role = self._get_required_role(field_info)
-        if required_role is not None and user_role != required_role:
+        if required_role and user_role not in required_role:
             return False
 
         return True
 
     def _get_section(self, field_info: Any) -> str:
         """Получает секцию настройки"""
-        # По умолчанию "General"
+        # По умолчанию "System"
         section = "System"
 
         # Проверяем указание section в json_schema_extra
@@ -374,11 +376,18 @@ class SettingsManager:
                 # Логируем ошибку, но не прерываем выполнение
                 logger.info(f"Error executing callback for {field_name}: {e}")
 
-    def _get_required_role(self, field_info: Any) -> str | None:
+    def _get_required_role(self, field_info: Any) -> list[str]:
         """Получает требуемую роль для изменения настройки"""
-        required_role = self.superuser_role
-        json_schema_extra = getattr(field_info, "json_schema_extra", None)
-        if json_schema_extra and isinstance(json_schema_extra, dict):
-            if "required_role" in json_schema_extra:
-                required_role = json_schema_extra["required_role"]
+        required_role = [self.superuser_role] if self.superuser_role else []
+
+        json_schema_extra = getattr(field_info, "json_schema_extra", {})
+        role_config = json_schema_extra.get("required_role") if isinstance(json_schema_extra, dict) else None
+
+        if role_config is None:
+            return required_role
+        elif isinstance(role_config, list):
+            required_role.extend(role_config)
+        else:
+            required_role.append(role_config)
+
         return required_role
