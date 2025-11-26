@@ -5,6 +5,39 @@
 
 ## Unreleased
 
+### 📚 Documentation
+
+
+
+- Rework manual
+  ([`d0bc440`](https://github.com/Frojen/setting-manager/commit/d0bc440c761427ac97602fee499ea6d87a9cb29f))
+
+### 🚀 New Features
+
+
+
+- Add default superuser role
+  ([`6c465a8`](https://github.com/Frojen/setting-manager/commit/6c465a8364dcd4a00e02ccd686702f000df9dfd3))
+
+- Add filter for settings
+  ([`c5cd5b8`](https://github.com/Frojen/setting-manager/commit/c5cd5b80cb7df26eeb861223ba499b6a99d0749f))
+
+- Default required superuser if set
+  ([`5989d88`](https://github.com/Frojen/setting-manager/commit/5989d88e00a28e15e79a392e789402fd79954088))
+
+- Exclude not allow settings
+  ([`71e7089`](https://github.com/Frojen/setting-manager/commit/71e7089d078048c8cab01e2c6c8315db455a3bbb))
+
+- Several required roles
+  ([`ee43859`](https://github.com/Frojen/setting-manager/commit/ee438591278b2e08dff9c6d7feee961b39fb1e64))
+
+### 🧪 Tests
+
+
+
+- Permissions test
+  ([`ebc8896`](https://github.com/Frojen/setting-manager/commit/ebc889619fbb5cfe636037b9f218160bd0cce022))
+
 
 ## v0.5.5 (2025-11-19)
 
