@@ -54,6 +54,7 @@ def create_settings_router(  # noqa: C901
     async def settings_page(request: Request, user_role: str | None = get_user_role_dependency()):
         """Страница управления настройками"""
         settings_grouped = await settings_manager.get_settings_grouped_by_sections(user_role)
+        is_superuser = settings_manager.superuser_role and user_role == settings_manager.superuser_role
 
         # Получаем только компонент пути из URL (учитываем path от прокси-сервера).
         api_base_path = request.url_for("settings_page").path.rstrip("/")
@@ -65,6 +66,7 @@ def create_settings_router(  # noqa: C901
                 "settings_grouped": settings_grouped,
                 "api_base_path": api_base_path,
                 "user_role": user_role,
+                "is_superuser": is_superuser,
             },
         )
 
