@@ -3,6 +3,23 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### 🐛 Bug Fixes
+
+
+
+- Not settings if required_role is None
+  ([`130818f`](https://github.com/Frojen/setting-manager/commit/130818f6c69f8f0548b9481aaaf77230bd2314cf))
+
+### 🚀 New Features
+
+
+
+- Add version and title on main page
+  ([`96454cb`](https://github.com/Frojen/setting-manager/commit/96454cbc61fe8ea11b29d6f0f1d5be125b68ebfd))
+
+
 ## v0.6.0 (2025-11-26)
 
 ### 📚 Documentation
