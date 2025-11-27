@@ -3,6 +3,16 @@
 > All notable changes to this project will be documented in this file.
 
 
+## Unreleased
+
+### 🐛 Bug Fixes
+
+
+
+- Delete prefix v for app
+  ([`d430930`](https://github.com/Frojen/setting-manager/commit/d430930513208ab078b90adb5c4fb64a7e50160d))
+
+
 ## v0.7.0 (2025-11-27)
 
 ### 🐛 Bug Fixes
