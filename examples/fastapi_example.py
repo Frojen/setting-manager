@@ -107,7 +107,10 @@ async def require_admin_access(request: Request) -> str:
 
 
 # --- 4. Создание приложения FastAPI ---
-app = FastAPI(title="Settings Manager Example")
+app = FastAPI(
+    title="Settings Manager Example",
+    version="1.2.3",
+)
 
 # Создаем и подключаем роутер для управления настройками
 settings_router = create_settings_router(
@@ -115,6 +118,7 @@ settings_router = create_settings_router(
     router_prefix="/settings",
     security_dependency=require_admin_access,
     superuser_role="admin",
+    app=app,  # Передаем экземпляр FastAPI
 )
 app.include_router(settings_router)
 
@@ -153,7 +157,6 @@ async def root():
 
 
 # --- 5. Запуск приложения ---
-# Для запуска используйте команду: uvicorn fastapi_example:app --reload
 if __name__ == "__main__":
     import uvicorn
 

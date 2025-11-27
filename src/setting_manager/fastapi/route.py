@@ -2,10 +2,11 @@ import os
 from collections.abc import Callable
 from typing import Any
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from .. import __version__ as lib_version
 from ..manager import SettingInfo, SettingsManager
 
 
@@ -15,6 +16,7 @@ def create_settings_router(  # noqa: C901
     template_dir: str | None = None,
     security_dependency: Callable | None = None,
     superuser_role: str | None = None,
+    app: FastAPI | None = None,
     **kwargs,
 ) -> APIRouter:
     """
@@ -25,11 +27,12 @@ def create_settings_router(  # noqa: C901
         router_prefix: Префикс для роутов
         template_dir: Директория с шаблонами
         security_dependency: Зависимость для проверки доступа к роутам
-                             Должна возвращать роль пользователя или None
-        superuser_role: Роль суперпользователя, который может редактировать все
+        superuser_role: Роль суперпользователя
+        app: Экземпляр FastAPI для получения title и version
     """
     # Устанавливаем роль суперпользователя в менеджере
-    settings_manager.superuser_role = superuser_role
+    if superuser_role:
+        settings_manager.superuser_role = superuser_role
 
     # Нормализуем router_prefix
     if router_prefix.endswith("/"):
@@ -56,8 +59,10 @@ def create_settings_router(  # noqa: C901
         settings_grouped = await settings_manager.get_settings_grouped_by_sections(user_role)
         is_superuser = settings_manager.superuser_role and user_role == settings_manager.superuser_role
 
-        # Получаем только компонент пути из URL (учитываем path от прокси-сервера).
         api_base_path = request.url_for("settings_page").path.rstrip("/")
+
+        app_title = app.title if app else ""
+        app_version = app.version if app else ""
 
         return templates.TemplateResponse(
             "grouped_settings.html",
@@ -67,6 +72,9 @@ def create_settings_router(  # noqa: C901
                 "api_base_path": api_base_path,
                 "user_role": user_role,
                 "is_superuser": is_superuser,
+                "app_title": app_title,
+                "app_version": app_version,
+                "lib_version": lib_version,
             },
         )
 
