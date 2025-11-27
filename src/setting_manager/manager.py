@@ -379,13 +379,23 @@ class SettingsManager:
     def _get_required_role(self, field_info: Any) -> list[str]:
         """Получает требуемую роль для изменения настройки"""
         required_role = [self.superuser_role] if self.superuser_role else []
-
         json_schema_extra = getattr(field_info, "json_schema_extra", {})
-        role_config = json_schema_extra.get("required_role") if isinstance(json_schema_extra, dict) else None
 
-        if role_config is None:
+        # Проверяем, есть ли вообще поле required_role в json_schema_extra
+        has_required_role_field = isinstance(json_schema_extra, dict) and "required_role" in json_schema_extra
+
+        if not has_required_role_field:
+            # Поле required_role не указано вообще - используем суперпользователя, если указан
             return required_role
-        elif isinstance(role_config, list):
+
+        # Поле required_role присутствует - получаем его значение
+        role_config = json_schema_extra["required_role"]
+
+        # Если значение пустой список или None - доступ для всех
+        if role_config is None or role_config == []:
+            return []
+
+        if isinstance(role_config, list):
             required_role.extend(role_config)
         else:
             required_role.append(role_config)
